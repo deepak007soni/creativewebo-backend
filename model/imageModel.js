@@ -5,6 +5,10 @@ const Schema = mongoose.Schema;
 const ImageSchema = new Schema(
   {
     name: { type: String },
+    img: {
+      data: Buffer,
+      contentType: String,
+    },
     size: { type: String },
     type: { type: String },
     encoding: { type: String },

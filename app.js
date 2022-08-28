@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
+const fs = require("fs");
+const path = require("path");
 var mongoose = require("mongoose");
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
-const imgModel = require("./model/imageModel");
+const uploader = multer({ dest: "uploads/" });
+const ImgModel = require("./model/imageModel");
 const cors = require("cors");
 
 require("dotenv").config();
@@ -34,26 +36,40 @@ app.use("/interview", alphonicApi);
 // image upload miideleware part
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads");
+    cb(null, "./uploads");
   },
   filename: (req, file, cb) => {
-    cb(null, file.fieldname + "-" + Date.now());
+    cb(null, file.originalname);
   },
 });
 
-
-
-var uploadStorage = multer({ storage: storage });
+var upload = multer({ storage: storage });
 
 // image upload miideleware part
 // image upload miideleware part
 // image upload miideleware part
 
-app.post("/api/image", upload.single("image"), function (req, res, next) {
-  let file = req.file;
-  console.log(file);
-  if (!file) return res.status(500).json({ msg: "error is there" });
-  else return res.status(200).json({ msg: " upload successful" });
+app.post("/api/image", uploader.single("image"), function (req, res, next) {
+  const saveImage = new ImgModel({
+    name: req.body.name,
+    img: {
+      data: fs.readFileSync(path.join("uploads/" + req.file.filename)),
+      // data: fs.readFileSync("uploads", req.file.fileName),
+      contentType: "image/jpg",
+    },
+  });
+  saveImage
+    .save()
+    .then((response) => {
+      let file = req.file;
+      if (!file) return res.status(500).json({ msg: "error is there" });
+      else
+        return res.status(200).json({ msg: " upload successful", file: file });
+      console.log(file);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 app.listen(process.env.PORT || 3000, function () {
