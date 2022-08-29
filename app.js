@@ -49,13 +49,13 @@ var upload = multer({ storage: storage });
 // image upload miideleware part
 // image upload miideleware part
 
-app.post("/api/image", uploader.single("image"), function (req, res, next) {
+app.post("/api/image", upload.single("image"), function (req, res, next) {
   const saveImage = new ImgModel({
     name: req.body.name,
     img: {
       data: fs.readFileSync(path.join("uploads/" + req.file.filename)),
       // data: fs.readFileSync("uploads", req.file.fileName),
-      contentType: "image/jpg",
+      contentType: "image/png",
     },
   });
   saveImage
